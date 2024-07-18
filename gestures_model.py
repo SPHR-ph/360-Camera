@@ -7,9 +7,17 @@ import threading
 import torch
 
 class GestureModel:
-    def __init__(self, model_path, label_path, resolution=(416, 416), camera_index = 0):
+    def __init__(self, model_path, label_path, resolution=(416, 416), os_type = "windows", camera_index = 0):
         self.model = YOLO(model_path)
         self.class_list = self.load_labels(label_path)
+        if os_type == "windows":
+            self.cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
+        elif os_type == "linux":
+            self.cap = cv2.VideoCapture(camera_index, cv2.CAP_V4L2)
+        else:
+            # This is for macos
+            self.cap = cv2.VideoCapture(camera_index, cv2.CAP_AVFOUNDATION)
+        # Video capture for linux
         self.cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, resolution[0])
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution[1])
@@ -83,28 +91,28 @@ class GestureModel:
         return img
 
 
-if __name__ == "__main__":
-    model_path = "best_ncnn_model"
-    label_path = "coco2.txt"
-    gesture_model = GestureModel(model_path, label_path)
+# if __name__ == "__main__":
+#     model_path = "best_ncnn_model"
+#     label_path = "coco2.txt"
+#     gesture_model = GestureModel(model_path, label_path)
 
-    while True:
-        frame = gesture_model.capture_frame()
-        if frame is None:
-            break
+#     while True:
+#         frame = gesture_model.capture_frame()
+#         if frame is None:
+#             break
 
-        processed_frame, confidence = gesture_model.detect_gestures(frame)
-        cv2.imshow("Video Capture", processed_frame)
+#         processed_frame, confidence = gesture_model.detect_gestures(frame)
+#         cv2.imshow("Video Capture", processed_frame)
 
-        if confidence >= 0.7 and not gesture_model.picture_taken:
-            gesture_model.countdown_and_save(frame)
-            gesture_model.picture_taken = True  # Ensure the flag is set
+#         if confidence >= 0.7 and not gesture_model.picture_taken:
+#             gesture_model.countdown_and_save(frame)
+#             gesture_model.picture_taken = True  # Ensure the flag is set
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             break
 
-        if confidence < 0.7:
-            gesture_model.picture_taken = False  # Reset the flag when the gesture is no longer detected
+#         if confidence < 0.7:
+#             gesture_model.picture_taken = False  # Reset the flag when the gesture is no longer detected
 
-    gesture_model.cap.release()
-    cv2.destroyAllWindows()
+#     gesture_model.cap.release()
+#     cv2.destroyAllWindows()

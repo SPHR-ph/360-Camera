@@ -4,17 +4,18 @@ from ultralytics import YOLO
 import threading
 
 class FaceDetection:
-    def __init__(self, model_path, label_path, resolution, os_type="windows"):
+    def __init__(self, model_path, label_path, resolution, os_type="windows", camera_index=0):
         self.model = YOLO(model_path)
         self.class_list = self.load_labels(label_path)
         # Capture for with respect to the OS
         if os_type == "windows":
-            self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+            self.cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
+        elif os_type == "linux":
+            self.cap = cv2.VideoCapture(camera_index, cv2.CAP_V4L2)
         else:
-            self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+            # This is for macos
+            self.cap = cv2.VideoCapture(camera_index, cv2.CAP_AVFOUNDATION)
         # Video capture for linux
-        if not self.cap.isOpened():
-            self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, resolution[0])
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution[1])
         self.cap.set(cv2.CAP_PROP_FPS, 30)

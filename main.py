@@ -23,8 +23,8 @@ if __name__ == "__main__":
     enable_zoom = False  # Disable or Enable zooming
 
     # Initialize the models
-    face_detection = FaceDetection(face_model_path, face_label_path, resolution)
-    gesture_model = GestureModel(gesture_model_path, gesture_label_path)
+    face_detection = FaceDetection(face_model_path, face_label_path, resolution=resolution, camera_index = 0)
+    gesture_model = GestureModel(gesture_model_path, gesture_label_path, camera_index= 0, resolution=resolution)
 
 
     while face_detection.is_running:
@@ -66,7 +66,10 @@ if __name__ == "__main__":
                 offset_x, offset_y = face_detection.calculate_offsets(all_boxes, latest_frame.shape)
 
                 print("Combined Face Center Offset (x, y):", offset_x, offset_y)
-
+                
+                '''
+                DRAWING DOTS ON THE FRAME FOR VISUALIZATION
+                '''
                 # Drawing a dot at the offset position making it green
                 offset_pos_x = latest_frame.shape[1] // 2 + offset_x
                 offset_pos_y = latest_frame.shape[0] // 2 + offset_y
@@ -81,7 +84,16 @@ if __name__ == "__main__":
                 frame_center_y = latest_frame.shape[0] // 2
                 cv2.circle(latest_frame, (frame_center_x, frame_center_y), 5, (255, 0, 0), -1)
 
-                # Enable zoom (if required)
+                # Drawing green dot which is the offset position
+                cv2.circle(latest_frame, (offset_pos_x, offset_pos_y), 5, (0, 255, 0), -1)
+
+                '''
+                Sending the offset values to the hardware
+                '''
+                if hardwareFlag:
+                    ser.write(str(offset_x).encode() + ",".encode() + str(offset_y).encode() + "\n".encode())
+
+                # Enable zoom 
                 if enable_zoom:
                     face_center_x, face_center_y, current_zoom_factor = face_detection.calculate_zoom(all_boxes, latest_frame.shape)
                     latest_frame = face_detection.smooth_zoom(latest_frame, face_center_x, face_center_y, current_zoom_factor)

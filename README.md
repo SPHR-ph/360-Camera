@@ -44,7 +44,7 @@ We would like to thank the following contributors for their valuable contributio
 - [Mohan Francis](https://github.com/janesmith)
 - [Josh Ratificar](https://github.com/johndoe)
 - [Leesandro V. Juanite](https://github.com/johndoe)
-- [Rodjean Gere](https://github.com/johndoe)
+- [Rodjean Gere](https://github.com/Ruujiii)
 - [Rhett Joshua Surban](https://github.com/johndoe)
 - [Alec Que Esteves](https://github.com/johndoe)
 - [Genesis matthew Polotan](https://github.com/johndoe)
